@@ -1,9 +1,4 @@
 <?php
-/**
- * author: NanQi
- * datetime: 2019/7/3 17:53
- */
-
 namespace Ethereum;
 
 interface ProxyApi
