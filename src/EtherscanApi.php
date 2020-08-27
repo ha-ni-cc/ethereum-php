@@ -3,13 +3,16 @@
  * author: NanQi
  * datetime: 2019/7/3 17:53
  */
+
 namespace Ethereum;
 
-class EtherscanApi implements ProxyApi {
+class EtherscanApi implements ProxyApi
+{
     protected $apiKey;
     protected $network;
 
-    function __construct(string $apiKey, $network = 'mainnet') {
+    function __construct(string $apiKey, $network = 'mainnet')
+    {
         $this->apiKey = $apiKey;
         $this->network = $network;
     }
@@ -49,7 +52,14 @@ class EtherscanApi implements ProxyApi {
 
     function gasPrice()
     {
-        return $this->send('eth_gasPrice');
+        $params['module'] = 'proxy';
+
+        $retDiv = Utils::fromWei($this->send('eth_gasPrice', $params), 'ether');
+        if (is_array($retDiv)) {
+            return Utils::divideDisplay($retDiv, 16);
+        } else {
+            return $retDiv;
+        }
     }
 
     function ethBalance(string $address)
@@ -79,7 +89,7 @@ class EtherscanApi implements ProxyApi {
         $params['module'] = 'transaction';
         $params['txhash'] = $txHash;
 
-        $res =  $this->send('gettxreceiptstatus', $params);
+        $res = $this->send('gettxreceiptstatus', $params);
         return $res['status'] == '1';
     }
 

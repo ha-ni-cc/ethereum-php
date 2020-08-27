@@ -3,20 +3,23 @@
  * author: NanQi
  * datetime: 2019/7/3 17:53
  */
+
 namespace Ethereum;
 
-class InfuraApi implements ProxyApi {
+class InfuraApi implements ProxyApi
+{
     protected $apiKey;
+    protected $network;
 
-    function __construct(string $apiKey) {
+    function __construct(string $apiKey, $network = 'mainnet')
+    {
         $this->apiKey = $apiKey;
+        $this->network = $network;
     }
 
     public function send($method, $params = [])
     {
-        $url = "https://mainnet.infura.io/v3/{$this->apiKey}";
-
-        $params[] = 'latest';
+        $url = "https://{$this->network}.infura.io/v3/{$this->apiKey}";
 
         $arr = array_map(function ($item) {
             if (is_array($item)) {
@@ -32,7 +35,6 @@ data;
         $res = Utils::httpRequest('POST', $url, [
             'body' => $data_string
         ]);
-
         if (isset($res['result'])) {
             return $res['result'];
         } else {
@@ -42,36 +44,54 @@ data;
 
     function gasPrice()
     {
-        return $this->send('eth_gasPrice');
+        $retDiv = Utils::fromWei($this->send('eth_gasPrice'), 'ether');
+        if (is_array($retDiv)) {
+            return Utils::divideDisplay($retDiv, 16);
+        } else {
+            return $retDiv;
+        }
     }
 
-    function ethBalance(string $address)
+    function ethBalance(string $address, string $block = 'latest')
     {
-        // TODO: Implement balance() method.
+        $retDiv = Utils::fromWei($this->send('eth_getBalance', [$address, $block]), 'ether');
+        if (is_array($retDiv)) {
+            return Utils::divideDisplay($retDiv, 16);
+        } else {
+            return $retDiv;
+        }
     }
 
-    function receiptStatus(string $txHash): bool
+    function receiptStatus(string $txHash): ?bool
     {
-        // TODO: Implement receiptStatus() method.
+        $res = $this->send('eth_getTransactionByHash', [$txHash]);
+        if (!$res) {
+            return false;
+        }
+        if (!$res['blockNumber']) {
+            return null;
+        }
+        $res = $this->send('eth_getTransactionReceipt', [$txHash]);
+        return isset($res['status']) && $res['status'] == '0x1';
     }
 
     function sendRawTransaction($raw)
     {
-        // TODO: Implement sendRawTransaction() method.
+        return $this->send('eth_sendRawTransaction', [$raw]);
     }
 
     function getNonce(string $address)
     {
-        // TODO: Implement getNonce() method.
+        return $this->send('eth_getTransactionCount', [$address]);
     }
 
     function getTransactionReceipt(string $txHash)
     {
-        // TODO: Implement getTransactionReceipt() method.
+        return $this->send('eth_getTransactionReceipt', [$txHash]);
     }
 
     function getNetwork(): string
     {
-        // TODO: Implement getNetwork() method.
+        return $this->network;
     }
 }

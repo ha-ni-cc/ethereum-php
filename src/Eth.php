@@ -3,9 +3,9 @@
  * author: NanQi
  * datetime: 2019/7/2 13:49
  */
+
 namespace Ethereum;
 
-use League\Event\EmitterTrait;
 use Web3p\EthereumTx\Transaction;
 
 /**
@@ -14,12 +14,12 @@ use Web3p\EthereumTx\Transaction;
  * @method mixed ethBalance(string $address)
  * @method mixed getTransactionReceipt(string $txHash)
  */
-class Eth {
-    use EmitterTrait;
-
+class Eth
+{
     protected $proxyApi;
 
-    function __construct(ProxyApi $proxyApi) {
+    function __construct(ProxyApi $proxyApi)
+    {
         $this->proxyApi = $proxyApi;
     }
 
@@ -35,14 +35,16 @@ class Eth {
         if ($type && isset($res[$type])) {
             $price = $res[$type];
             $price = Utils::toWei($price, 'gwei');
-//            $price = $price * 1e9;
+            //$price = $price * 1e9;
             return $price;
         } else {
             return $res;
         }
     }
 
-    public static function getChainId($network) : int {
+    protected function getChainId(): int
+    {
+        $network = $this->proxyApi->getNetwork();
         $chainId = 1;
         switch ($network) {
             case 'rinkeby':
@@ -70,7 +72,7 @@ class Eth {
         }
 
         $eth = Utils::toWei("$value", 'ether');
-//        $eth = $value * 1e16;
+        //$eth = $value * 1e16;
         $eth = Utils::toHex($eth, true);
 
         $transaction = new Transaction([
@@ -80,15 +82,10 @@ class Eth {
             'gas' => '0x76c0',
             'gasPrice' => "$gasPrice",
             'value' => "$eth",
-            'chainId' => self::getChainId($this->proxyApi->getNetwork()),
+            'chainId' => $this->getChainId(),
         ]);
 
         $raw = $transaction->sign($privateKey);
-        $res = $this->proxyApi->sendRawTransaction('0x'.$raw);
-        if ($res !== false) {
-            $this->emit(new TransactionEvent($transaction, $privateKey, $res));
-        }
-
-        return $res;
+        return $this->proxyApi->sendRawTransaction('0x' . $raw);
     }
 }

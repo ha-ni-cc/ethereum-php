@@ -9,11 +9,13 @@ namespace Ethereum;
 use InvalidArgumentException;
 use Web3p\EthereumTx\Transaction;
 
-class ERC20 extends Eth {
+class ERC20 extends Eth
+{
 
     protected $contractAddress;
 
-    function __construct(string $contractAddress, ProxyApi $proxyApi) {
+    function __construct(string $contractAddress, ProxyApi $proxyApi)
+    {
         parent::__construct($proxyApi);
 
         $this->contractAddress = $contractAddress;
@@ -27,7 +29,6 @@ class ERC20 extends Eth {
                 'contractaddress' => $this->contractAddress,
                 'address' => $address
             ]);
-
             if ($res !== false) {
                 return Utils::toDisplayAmount($res, $decimals);
             } else {
@@ -36,10 +37,9 @@ class ERC20 extends Eth {
         } else {
             throw new InvalidArgumentException('type invalid');
         }
-
     }
 
-    public function balance(string $address, int $decimals = 16)
+    public function balance(string $address, int $decimals)
     {
         $params = [];
         $params['to'] = $this->contractAddress;
@@ -47,10 +47,13 @@ class ERC20 extends Eth {
         $method = 'balanceOf(address)';
         $formatMethod = Formatter::toMethodFormat($method);
         $formatAddress = Formatter::toAddressFormat($address);
-
         $params['data'] = "0x{$formatMethod}{$formatAddress}";
 
-        $balance = $this->proxyApi->send('eth_call', $params);
+        if ($this->proxyApi instanceof InfuraApi) {
+            $balance = $this->proxyApi->send('eth_call', [$params, 'latest']);
+        } else {
+            $balance = $this->proxyApi->send('eth_call', $params);
+        }
         return Utils::toDisplayAmount($balance, $decimals);
     }
 
@@ -68,7 +71,7 @@ class ERC20 extends Eth {
             'gas' => '0x15F90',
             'gasPrice' => "$gasPrice",
             'value' => Utils::NONE,
-            'chainId' => self::getChainId($this->proxyApi->getNetwork()),
+            'chainId' => $this->getChainId(),
         ];
         $val = Utils::toMinUnitByDecimals("$value", 8);
 
@@ -81,11 +84,6 @@ class ERC20 extends Eth {
         $transaction = new Transaction($params);
 
         $raw = $transaction->sign($privateKey);
-        $res = $this->proxyApi->sendRawTransaction('0x'.$raw);
-        if ($res !== false) {
-            $this->emit(new TransactionEvent($transaction, $privateKey, $res));
-        }
-
-        return $res;
+        return $this->proxyApi->sendRawTransaction('0x' . $raw);
     }
 }

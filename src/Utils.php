@@ -83,7 +83,7 @@ class Utils
      * @param bool $isPrefix
      * @return string
      */
-    public static function toHex($value, $isPrefix=false)
+    public static function toHex($value, $isPrefix = false)
     {
         if (is_numeric($value)) {
             // turn to hex number
@@ -289,13 +289,13 @@ class Utils
             switch (MATH_BIGINTEGER_MODE) {
                 case $whole::MODE_GMP:
                     static $two;
-                    $powerBase = gmp_pow(gmp_init(10), (int) $fractionLength);
+                    $powerBase = gmp_pow(gmp_init(10), (int)$fractionLength);
                     break;
                 case $whole::MODE_BCMATH:
-                    $powerBase = bcpow('10', (string) $fractionLength, 0);
+                    $powerBase = bcpow('10', (string)$fractionLength, 0);
                     break;
                 default:
-                    $powerBase = pow(10, (int) $fractionLength);
+                    $powerBase = pow(10, (int)$fractionLength);
                     break;
             }
             $base = new BigInteger($powerBase);
@@ -367,12 +367,12 @@ class Utils
      */
     public static function toBn($number)
     {
-        if ($number instanceof BigInteger){
+        if ($number instanceof BigInteger) {
             $bn = $number;
         } elseif (is_int($number)) {
             $bn = new BigInteger($number);
         } elseif (is_numeric($number)) {
-            $number = (string) $number;
+            $number = (string)$number;
 
             if (self::isNegative($number)) {
                 $count = 1;
@@ -464,13 +464,13 @@ class Utils
             switch (MATH_BIGINTEGER_MODE) {
                 case $whole::MODE_GMP:
                     static $two;
-                    $powerBase = gmp_pow(gmp_init(10), (int) $fractionLength);
+                    $powerBase = gmp_pow(gmp_init(10), (int)$fractionLength);
                     break;
                 case $whole::MODE_BCMATH:
-                    $powerBase = bcpow('10', (string) $fractionLength, 0);
+                    $powerBase = bcpow('10', (string)$fractionLength, 0);
                     break;
                 default:
-                    $powerBase = pow(10, (int) $fractionLength);
+                    $powerBase = pow(10, (int)$fractionLength);
                     break;
             }
             $base = new BigInteger($powerBase);
@@ -493,9 +493,11 @@ class Utils
      * @return mixed|StreamInterface
      * @throws GuzzleException
      */
-    public static function httpRequest(string $method, string $url, array $options = []) {
-        $client = new Client([ 'timeout'  => 30 ]);
+    public static function httpRequest(string $method, string $url, array $options = [])
+    {
+        $client = new Client(['timeout' => 3, 'proxy' => 'http://127.0.0.1:10887']);
         $res = $client->request($method, $url, $options)->getBody();
+        //var_dump((string)$res);
         $res = json_decode((string)$res, true);
         return $res;
     }
