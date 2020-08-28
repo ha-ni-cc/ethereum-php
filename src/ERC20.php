@@ -1,8 +1,4 @@
 <?php
-/**
- * author: NanQi
- * datetime: 2019/7/2 16:07
- */
 
 namespace Ethereum;
 

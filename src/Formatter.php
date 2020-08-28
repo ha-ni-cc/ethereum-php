@@ -1,8 +1,5 @@
 <?php
-/**
- * author: NanQi
- * datetime: 2019/7/2 17:48
- */
+
 namespace Ethereum;
 
 /**
@@ -10,7 +7,8 @@ namespace Ethereum;
  * Class Formatter
  * @package Ethereum
  */
-class Formatter {
+class Formatter
+{
 
     /**
      * 对于方法名和参数类型做签名
@@ -54,6 +52,6 @@ class Formatter {
         if ($padded !== 'f') {
             $padded = '0';
         }
-        return implode('', array_fill(0, $digit-mb_strlen($bnHex), $padded)) . $bnHex;
+        return implode('', array_fill(0, $digit - mb_strlen($bnHex), $padded)) . $bnHex;
     }
 }

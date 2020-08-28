@@ -1,4 +1,5 @@
 <?php
+
 namespace Ethereum;
 
 class EtherscanApi implements ProxyApi

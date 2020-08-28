@@ -1,9 +1,4 @@
 <?php
-/**
- * author: NanQi
- * datetime: 2019/7/2 15:42
- */
-
 namespace Ethereum;
 
 use GuzzleHttp\Client;

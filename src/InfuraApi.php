@@ -1,4 +1,5 @@
 <?php
+
 namespace Ethereum;
 
 class InfuraApi implements ProxyApi

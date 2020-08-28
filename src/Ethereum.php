@@ -1,8 +1,4 @@
 <?php
-/**
- * author: NanQi
- * datetime: 2019/8/24 11:20
- */
 
 class Ethereum {
 
