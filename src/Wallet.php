@@ -7,14 +7,15 @@ use FurqanSiddiqui\BIP39\BIP39;
 use FurqanSiddiqui\BIP39\Exception\MnemonicException;
 use FurqanSiddiqui\BIP39\Exception\WordListException;
 
-class Wallet {
+class Wallet
+{
     const DEFAULT_PATH = "m/44'/60'/0'/0/0";
 
     /**
      * 生成秘钥创建账户
      * @return array
      */
-    public static function newAccountByPrivateKey() : array
+    public static function newAccountByPrivateKey(): array
     {
         $privateKey = PEMHelper::generateNewPrivateKey();
         $address = PEMHelper::privateKeyToAddress($privateKey);
@@ -28,14 +29,15 @@ class Wallet {
     /**
      * 生成助记词创建账户
      * @param string $passphrase 密码
+     * @param int $wordCount 单词数量
      * @param string $path BIP44路径
      * @return array
      * @throws MnemonicException
      * @throws WordListException
      */
-    public static function newAccountByMnemonic(string $passphrase = '', string $path = self::DEFAULT_PATH) : array
+    public static function newAccountByMnemonic(string $passphrase = '', int $wordCount = 12, string $path = self::DEFAULT_PATH): array
     {
-        $mnemonic = BIP39::Generate(12);
+        $mnemonic = BIP39::Generate($wordCount);
         $seed = $mnemonic->generateSeed($passphrase);
         $HDKey = BIP44::fromMasterSeed($seed)->derive($path);
 
@@ -57,7 +59,7 @@ class Wallet {
      * @throws MnemonicException
      * @throws WordListException
      */
-    public static function revertAccountByMnemonic(string $mnemonic, string $passphrase = '', string $path = self::DEFAULT_PATH) : array
+    public static function revertAccountByMnemonic(string $mnemonic, string $passphrase = '', string $path = self::DEFAULT_PATH): array
     {
         $seed = BIP39::Words($mnemonic)->generateSeed($passphrase);
         $HDKey = BIP44::fromMasterSeed($seed)->derive($path);
