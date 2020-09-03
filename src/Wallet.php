@@ -71,4 +71,17 @@ class Wallet
             "address" => $address
         ];
     }
+
+    /**
+     * 使用私钥还原账户
+     * @param string $privateKey
+     * @return array
+     */
+    public static function revertAccountByKey(string $privateKey)
+    {
+        return [
+            "key" => $privateKey,
+            "address" => PEMHelper::privateKeyToAddress($privateKey)
+        ];
+    }
 }
